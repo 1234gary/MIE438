@@ -1,6 +1,10 @@
 #include <DRV8835MotorShield.h>
+#include <X113647Stepper.h>
 
 DRV8835MotorShield ms;
+
+static const int STEPS_PER_REVOLUTION = 64 * 32;  
+X113647Stepper myStepper(STEPS_PER_REVOLUTION, 8, 9, 10, 11);
 
 void setup() {
   // put your setup code here, to run once:
@@ -17,6 +21,8 @@ void loop() {
   delay(100);
   ms.setM1Speed(100);
 }
+
+
 
 //void setM1Speed(int speed) 
 //void setM2Speed(int speed) 
