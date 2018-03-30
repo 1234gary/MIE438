@@ -7,7 +7,7 @@ const int LEFT = -1;
 const int RIGHT = 1;
 
 static const int STEPS_PER_REVOLUTION = 64 * 32;  
-X113647Stepper myStepper(STEPS_PER_REVOLUTION, 2, 3, 4, 5);
+//X113647Stepper myStepper(STEPS_PER_REVOLUTION, 2, 3, 4, 5);
 DRV8835MotorShield motors;
 Servo myservo;
 
@@ -17,9 +17,8 @@ void setup() {
   digitalWrite(PowerPin, HIGH);
   Serial.begin(9600);
   myStepper.setSpeed(6.5);
-//    motors.setM1Speed(-100);
-//    
-//    motors.setM2Speed(-100);
+  motors.flipM1(true);
+  motors.flipM2(true);
 }
 
 //void myservo.write(pos); where pos between (0, 180) to move servo
@@ -53,10 +52,10 @@ int error = 100;
 
 void loop(){
   // scanning for fire
-//  while (error > EPS){
+  while (error > EPS){
     error = scanForFire(position);
-//    wheelPID(error, P, I, D);
-//  }
+    wheelPID(error, P, I, D);
+  }
 }
 
 //void loop(){
@@ -89,18 +88,16 @@ int scanForFire(int stepPosition) {
     sensorLeft = analogRead(A3);
 
     if ((sensorMiddle > sensorRight * 1.4)&&(sensorMiddle > sensorLeft * 1.4)){
-//      return stepPosition;
-continue;
+      return stepPosition;
     }
-    
     if (sensorRight > sensorLeft){
       fireDirection = LEFT;
     }else{
       fireDirection = RIGHT;
     }
     
-    stepPosition = 50*fireDirection+stepPosition;
-    myStepper.step(50*fireDirection);
+    stepPosition = 10*fireDirection+stepPosition;
+    myStepper.step(10*fireDirection);
     delay(500);
     
     Serial.println("____________Sensor Values____________");
@@ -120,12 +117,16 @@ continue;
 void wheelPID(int error, double P, double I, double D) {
   int lastError;
   if (error > 0){
-    return;
+    m1Speed = min(error * P, 400);
+    m2Speed = max(-error * P, -400);
   }
   else {
-    return;
+    m2Speed = min(error * P, 400);
+    m1Speed = max(-error * P, -400);
   }
-  
+  motors.setSpeeds(m1Speed, m2Speed);
+  delay(300);
+  motors.setSpeeds(0, 0);
 }
 // Repeat:
 // 1. align with the stepper until left and right sensor are low and middle sensor is high
