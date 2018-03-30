@@ -7,13 +7,8 @@ const int LEFT = -1;
 const int RIGHT = 1;
 
 static const int STEPS_PER_REVOLUTION = 64 * 32;  
-<<<<<<< HEAD
 X113647Stepper myStepper(STEPS_PER_REVOLUTION, 2, 3, 4, 5);
 DRV8835MotorShield motors;
-=======
-//X113647Stepper myStepper(STEPS_PER_REVOLUTION, 2, 3, 4, 5);
-//DRV8835MotorShield ms;
->>>>>>> 75656bb80c320680031b78fa8798b80556405ac7
 Servo myservo;
 
 void setup() {
@@ -22,15 +17,9 @@ void setup() {
   digitalWrite(PowerPin, HIGH);
   Serial.begin(9600);
   myStepper.setSpeed(6.5);
-<<<<<<< HEAD
-  myservo.attach(9);
 //    motors.setM1Speed(-100);
 //    
 //    motors.setM2Speed(-100);
-
-=======
-//  myservo.attach(9);
->>>>>>> 75656bb80c320680031b78fa8798b80556405ac7
 }
 
 //void myservo.write(pos); where pos between (0, 180) to move servo
@@ -55,7 +44,7 @@ void setup() {
 
 int position = 0;
 int EPS = 10;
-bool isFire = True;
+bool isFire = true;
 int threshold = 0;
 const double P = 5.0;
 const double I = 0.0;
@@ -64,10 +53,10 @@ int error = 100;
 
 void loop(){
   // scanning for fire
-  while (error > EPS){
+//  while (error > EPS){
     error = scanForFire(position);
 //    wheelPID(error, P, I, D);
-  }
+//  }
 }
 
 //void loop(){
@@ -99,22 +88,19 @@ int scanForFire(int stepPosition) {
     sensorMiddle = analogRead(A2);
     sensorLeft = analogRead(A3);
 
-<<<<<<< HEAD
-    if ((sensorMiddle > sensorLeft*1.4)&&(sensorMiddle > sensorRight*1.4)){
-      continue;
-=======
     if ((sensorMiddle > sensorRight * 1.4)&&(sensorMiddle > sensorLeft * 1.4)){
-      return stepPosition;
->>>>>>> 75656bb80c320680031b78fa8798b80556405ac7
+//      return stepPosition;
+continue;
     }
+    
     if (sensorRight > sensorLeft){
       fireDirection = LEFT;
     }else{
       fireDirection = RIGHT;
     }
     
-    stepPosition = 10*fireDirection+stepPosition;
-    myStepper.step(10*fireDirection);
+    stepPosition = 50*fireDirection+stepPosition;
+    myStepper.step(50*fireDirection);
     delay(500);
     
     Serial.println("____________Sensor Values____________");
