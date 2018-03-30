@@ -17,9 +17,8 @@ void setup() {
   digitalWrite(PowerPin, HIGH);
   Serial.begin(9600);
   myStepper.setSpeed(8);
-//    motors.setM1Speed(-100);
-//    
-//    motors.setM2Speed(-100);
+  motors.flipM1(true);
+  motors.flipM2(true);
 }
 
 //void myservo.write(pos); where pos between (0, 180) to move servo
@@ -46,17 +45,20 @@ int position = 0;
 int EPS = 10;
 bool isFire = true;
 int threshold = 0;
-const double P = 5.0;
+const double P = 1.0;
 const double I = 0.0;
 const double D = 0.0;
 int error = 100;
 
 void loop(){
   // scanning for fire
-//  while (error > EPS){
-    error = scanForFire(position);
-//    wheelPID(error, P, I, D);
-//  }
+  error = scanForFire(0);
+  while (abs(error) > EPS){
+    error = scanForFire(error);
+    wheelPID(error, P, I, D);
+  }
+  Serial.println("Final Error:");
+  Serial.println(error);
 }
 
 //void loop(){
@@ -88,11 +90,24 @@ int scanForFire(int stepPosition) {
     sensorMiddle = analogRead(A2);
     sensorLeft = analogRead(A3);
 
-    if ((sensorMiddle > sensorRight * 1.4)&&(sensorMiddle > sensorLeft * 1.4)){
-//      return stepPosition;
-continue;
-    }
+     Serial.println("____________Sensor Values____________");
+//    Serial.print("Left Sensor: ");
+//    Serial.println(sensorLeft);
+//    Serial.print("Middle Sensor: ");
+//    Serial.println(sensorMiddle);
+//    Serial.print("Right Sensor: ");
+//    Serial.println(sensorRight);
+    Serial.print("Position:");
+    Serial.println(stepPosition);
+  
+    int maxValue = max(sensorMiddle, sensorRight);
+    maxValue = max(maxValue, sensorLeft);
+    if (maxValue < 10)
+      continue;
     
+    if ((sensorMiddle > sensorRight * 1.4)&&(sensorMiddle > sensorLeft * 1.4)){
+      return stepPosition;
+    }
     if (sensorRight > sensorLeft){
       fireDirection = LEFT;
     }else{
@@ -102,30 +117,25 @@ continue;
     stepPosition = 50*fireDirection+stepPosition;
     myStepper.step(50*fireDirection);
     delay(50);
-    
-    Serial.println("____________Sensor Values____________");
-    Serial.print("Left Sensor: ");
-    Serial.println(sensorLeft);
-    Serial.print("Middle Sensor: ");
-    Serial.println(sensorMiddle);
-    Serial.print("Right Sensor: ");
-    Serial.println(sensorRight);
-    Serial.print("Position:");
-    Serial.println(position);
-    }
+  }
 }
 
 
 
 void wheelPID(int error, double P, double I, double D) {
   int lastError;
+  int m1Speed, m2Speed;
   if (error > 0){
-    return;
+    m1Speed = min(error * P, 200);
+    m2Speed = max(-error * P, -200);
   }
   else {
-    return;
+    m1Speed = max(error * P, -200);
+    m2Speed = min(-error * P, 200);
   }
-  
+  motors.setSpeeds(m1Speed, m2Speed);
+  delay(300);
+  motors.setSpeeds(0, 0);
 }
 // Repeat:
 // 1. align with the stepper until left and right sensor are low and middle sensor is high
