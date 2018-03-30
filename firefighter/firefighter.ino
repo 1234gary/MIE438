@@ -7,7 +7,7 @@ const int RIGHT = 1;
 
 static const int STEPS_PER_REVOLUTION = 64 * 32;  
 X113647Stepper myStepper(STEPS_PER_REVOLUTION, 2, 3, 4, 5);
-DRV8835MotorShield ms;
+DRV8835MotorShield motors;
 Servo myservo;
 
 void setup() {
@@ -15,6 +15,10 @@ void setup() {
   Serial.begin(9600);
   myStepper.setSpeed(6.5);
   myservo.attach(9);
+//    motors.setM1Speed(-100);
+//    
+//    motors.setM2Speed(-100);
+
 }
 
 //void myservo.write(pos); where pos between (0, 180) to move servo
@@ -51,7 +55,7 @@ void scanForFire(int stepPosition) {
     sensorMiddle = analogRead(A2);
     sensorRight = analogRead(A3);
 
-    if ((sensorMiddle > sensorLeft)&&(sensorMiddle > sensorRight)){
+    if ((sensorMiddle > sensorLeft*1.4)&&(sensorMiddle > sensorRight*1.4)){
       continue;
     }
     if (sensorLeft > sensorRight){
