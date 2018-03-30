@@ -42,23 +42,40 @@ void setup() {
 
 
 int position = 0;
-int EPS = 10;
+int EPS = 21;
 bool isFire = true;
 int threshold = 0;
-const double P = 1.0;
+const double P = 5.0;
 const double I = 0.0;
 const double D = 0.0;
 int error = 100;
 
 void loop(){
+  int sensorRight = analogRead(A1);
+  int sensorMiddle = analogRead(A2);
+  int sensorLeft = analogRead(A3);
+  int maxValue = max(sensorMiddle, sensorRight);
+    maxValue = max(maxValue, sensorLeft);
+    if (maxValue < 10)
+      return;
+      
+   Serial.print("Middle Sensor: ");
+    Serial.println(analogRead(A2));
+  if (analogRead(A2) > 200){
+    motors.setSpeeds(0, 0);
+    return; 
+  }
   // scanning for fire
   error = scanForFire(0);
   while (abs(error) > EPS){
     error = scanForFire(error);
     wheelPID(error, P, I, D);
   }
-  Serial.println("Final Error:");
-  Serial.println(error);
+//  Serial.println("Final Error:");
+//  Serial.println(error);
+
+  motors.setSpeeds(200, 200);
+  delay(300);
 }
 
 //void loop(){
@@ -83,8 +100,8 @@ bool checkFire(int threshold){
 
 int scanForFire(int stepPosition) {
   int sensorLeft, sensorMiddle, sensorRight;
-  int fireDirection;
-  
+  int fireDirection, stride;
+  motors.setSpeeds(0, 0);
   while(true){
     sensorRight = analogRead(A1);
     sensorMiddle = analogRead(A2);
@@ -113,9 +130,14 @@ int scanForFire(int stepPosition) {
     }else{
       fireDirection = RIGHT;
     }
+    if (abs(stepPosition) < 50){
+      stride = 10;
+    }else{
+      stride = 50;
+    }
     
-    stepPosition = 50*fireDirection+stepPosition;
-    myStepper.step(50*fireDirection);
+    stepPosition = stride*fireDirection+stepPosition;
+    myStepper.step(stride*fireDirection);
     delay(50);
   }
 }
@@ -134,7 +156,7 @@ void wheelPID(int error, double P, double I, double D) {
     m2Speed = min(-error * P, 200);
   }
   motors.setSpeeds(m1Speed, m2Speed);
-  delay(300);
+  delay(50);
   motors.setSpeeds(0, 0);
 }
 // Repeat:
