@@ -16,7 +16,7 @@ void setup() {
   pinMode(PowerPin, OUTPUT);     
   digitalWrite(PowerPin, HIGH);
   Serial.begin(9600);
-  myStepper.setSpeed(6.5);
+  myStepper.setSpeed(8);
 //    motors.setM1Speed(-100);
 //    
 //    motors.setM2Speed(-100);
@@ -101,7 +101,7 @@ continue;
     
     stepPosition = 50*fireDirection+stepPosition;
     myStepper.step(50*fireDirection);
-    delay(500);
+    delay(50);
     
     Serial.println("____________Sensor Values____________");
     Serial.print("Left Sensor: ");
