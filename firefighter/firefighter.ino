@@ -48,7 +48,7 @@ int threshold = 0;
 const double P = 5.0;
 const double I = 0.0;
 const double D = 0.0;
-int error = 100;
+int error = 0;
 
 void loop(){
   int sensorRight = analogRead(A1);
@@ -66,7 +66,7 @@ void loop(){
     return; 
   }
   // scanning for fire
-  error = scanForFire(0);
+  error = scanForFire(error);
   while (abs(error) > EPS){
     error = scanForFire(error);
     wheelPID(error, P, I, D);
@@ -122,7 +122,7 @@ int scanForFire(int stepPosition) {
     if (maxValue < 10)
       continue;
     
-    if ((sensorMiddle > sensorRight * 1.4)&&(sensorMiddle > sensorLeft * 1.4)){
+    if ((sensorMiddle > sensorRight * 1.8)&&(sensorMiddle > sensorLeft * 1.8)){
       return stepPosition;
     }
     if (sensorRight > sensorLeft){
@@ -130,15 +130,16 @@ int scanForFire(int stepPosition) {
     }else{
       fireDirection = RIGHT;
     }
-    if (abs(stepPosition) < 50){
-      stride = 10;
-    }else{
-      stride = 50;
-    }
+//    if (abs(stepPosition) < 50){
+//      stride = 10;
+//    }else{
+//      stride = 50;
+//    }
+stride = 10;
     
     stepPosition = stride*fireDirection+stepPosition;
     myStepper.step(stride*fireDirection);
-    delay(50);
+    delay(10);
   }
 }
 
