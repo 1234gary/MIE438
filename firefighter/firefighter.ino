@@ -23,10 +23,10 @@ void setup() {
   motors.flipM2(true);
 }
 
-int EPS = 31;
-const double P = 1.0;
+int EPS = 2;
+const double P = 20.0;
 const double I = 0.0;
-const double D = 1.0;
+const double D = 20.0;
 int error = 0;
 
 void loop(){
@@ -74,7 +74,7 @@ int scanForFire(int stepPosition) {
     fireDirection = (sensorRight > sensorLeft)?LEFT:RIGHT;
     stride = (sensorRight > sensorLeft)?40:49;
   
-    stepPosition += 20*fireDirection;
+    stepPosition += fireDirection;
     myStepper.step(stride*fireDirection);
     delay(50);
   }
